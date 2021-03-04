@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8868567235256398628}
   - component: {fileID: 8868567235256398629}
   - component: {fileID: 8868567235256398626}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: down
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8868567236326683747}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: GroundSet4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 8868567236546948470}
   - component: {fileID: 8868567236546948471}
   - component: {fileID: 8868567236546948468}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: up
   m_TagString: Untagged
   m_Icon: {fileID: 0}

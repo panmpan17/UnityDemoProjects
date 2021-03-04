@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 
 
-public virtual class GameControl : MonoBehaviour
+public class GameControl : MonoBehaviour
 {
     static public GameControl ins;
 
@@ -15,6 +15,9 @@ public virtual class GameControl : MonoBehaviour
     private Vector3 spawnPosition;
     [SerializeField]
     private float distroyX;
+
+    [SerializeField]
+    private float scoreX;
 
     [SerializeField]
     private float moveSpeed;
@@ -33,12 +36,11 @@ public virtual class GameControl : MonoBehaviour
     private TextMeshProUGUI scoreText;
     private int score;
 
-    private List<GameObject> grounds;
+    private List<GameObject> grounds = new List<GameObject>();
 
-    private void Awake() {
+    protected virtual void Awake() {
         ins = this;
         birdContoller.enabled = false;
-        grounds = new List<GameObject>();
     }
 
     void Update()
@@ -59,11 +61,11 @@ public virtual class GameControl : MonoBehaviour
         for (int i = 0; i < grounds.Count; i++)
         {
             Vector3 position = grounds[i].transform.position;
-            bool cross = position.x <= birdContoller.transform.position.x;
+            bool cross = position.x <= scoreX;
 
             position.x += moveSpeed * Time.deltaTime;
 
-            if (!cross && position.x <= birdContoller.transform.position.x)
+            if (!cross && position.x <= scoreX)
             {
                 score += 1;
                 scoreText.text = score.ToString();
@@ -100,7 +102,7 @@ public virtual class GameControl : MonoBehaviour
     public virtual void ResetGame()
     {
         startText.SetActive(false);
-        birdContoller.enabled = true;
+        if (birdContoller != null) birdContoller.enabled = true;
         score = 0;
         scoreText.text = "0";
 
