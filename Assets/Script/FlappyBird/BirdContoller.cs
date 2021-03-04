@@ -4,41 +4,76 @@ using UnityEngine;
 
 public class BirdContoller : MonoBehaviour
 {
-    [SerializeField]
-    private float jumpVelocity;
-    [SerializeField]
-    private float startDirection;
-    [SerializeField]
-    private float angularVelocity;
+    public float jumpVelocity = 3;
 
-    private Vector3 initialPosition;
+    public float upwardAngularSpeed = 360;
+    public float upwardStopAngle;
+    private bool upward;
+    public float downwardAngularSpeed = -180;
+
     private new Rigidbody2D rigidbody2D;
+    private Vector3 initialPosition;
+
 
     private void Awake() {
-        initialPosition = transform.position;
         rigidbody2D = GetComponent<Rigidbody2D>();
         rigidbody2D.simulated = false;
+
+        initialPosition = transform.position;
     }
 
     private void OnEnable() {
         transform.position = initialPosition;
         rigidbody2D.simulated = true;
         rigidbody2D.velocity = new Vector2(0, jumpVelocity);
-        rigidbody2D.angularVelocity = angularVelocity;
-        transform.rotation = Quaternion.Euler(0, 0, startDirection);
+        rigidbody2D.angularVelocity = downwardAngularSpeed;
+        transform.rotation = Quaternion.Euler(0, 0, upwardStopAngle);
     }
 
     void Update()
     {
+        if (upward)
+        {
+            if (transform.rotation.eulerAngles.z >= upwardStopAngle)
+            {
+                upward = false;
+                rigidbody2D.angularVelocity = downwardAngularSpeed;
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            transform.rotation = Quaternion.Euler(0, 0, startDirection);
-            rigidbody2D.velocity = new Vector2(0, jumpVelocity);
+            // Debug.Log("Michael");
+            if (rigidbody2D.simulated)
+            {
+                rigidbody2D.velocity = new Vector2(0, jumpVelocity);
+
+                rigidbody2D.angularVelocity = upwardAngularSpeed;
+                upward = true;
+            }
+            else
+            {
+                transform.position = initialPosition;
+
+                rigidbody2D.simulated = true;
+                rigidbody2D.velocity = new Vector2(0, jumpVelocity);
+
+                transform.rotation = Quaternion.Euler(0, 0, 0);
+                rigidbody2D.angularVelocity = upwardAngularSpeed;
+                upward = true;
+            }
         }
+        // if (Input.GetKeyDown(KeyCode.Space))
+        // {
+        //     rigidbody2D.velocity = new Vector2(0, jumpVelocity);
+
+            // transform.rotation = Quaternion.Euler(0, 0, startDirection);
+        // }
     }
 
     private void OnCollisionEnter2D(Collision2D other) {
-        enabled = false;
+        rigidbody2D.simulated = false;
         GameControl.ins.GameOver();
+        enabled = false;
     }
 }

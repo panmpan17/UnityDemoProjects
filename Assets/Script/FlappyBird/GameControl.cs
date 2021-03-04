@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 
 
-public class GameControl : MonoBehaviour
+public virtual class GameControl : MonoBehaviour
 {
     static public GameControl ins;
 
@@ -45,51 +45,39 @@ public class GameControl : MonoBehaviour
     {
         if (!birdContoller.enabled)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                startText.SetActive(false);
-                birdContoller.enabled = true;
-                score = 0;
-                scoreText.text = "0";
-
-                while (grounds.Count > 0)
-                {
-                    Destroy(grounds[0]);
-                    grounds.RemoveAt(0);
-                }
-
-                SpawnGround();
-            }
+            if (Input.GetKeyDown(KeyCode.Space)) ResetGame();
         }
-        else
+        else UpdateGround();
+    }
+
+    protected void UpdateGround()
+    {
+        spawnGapProgess += Time.deltaTime;
+        if (spawnGapProgess >= spawnGap)
+            SpawnGround();
+
+        for (int i = 0; i < grounds.Count; i++)
         {
-            spawnGapProgess += Time.deltaTime;
-            if (spawnGapProgess >= spawnGap)
-                SpawnGround();
+            Vector3 position = grounds[i].transform.position;
+            bool cross = position.x <= birdContoller.transform.position.x;
 
-            for (int i = 0; i < grounds.Count; i++)
+            position.x += moveSpeed * Time.deltaTime;
+
+            if (!cross && position.x <= birdContoller.transform.position.x)
             {
-                Vector3 position = grounds[i].transform.position;
-                bool cross = position.x <= birdContoller.transform.position.x;
-
-                position.x += moveSpeed * Time.deltaTime;
-
-                if (!cross && position.x <= birdContoller.transform.position.x)
-                {
-                    score += 1;
-                    scoreText.text = score.ToString();
-                }
-
-                if (position.x <= distroyX)
-                {
-                    Destroy(grounds[i]);
-                    grounds.RemoveAt(i);
-                    i--;
-                    break;
-                }
-
-                grounds[i].transform.position = position;
+                score += 1;
+                scoreText.text = score.ToString();
             }
+
+            if (position.x <= distroyX)
+            {
+                Destroy(grounds[i]);
+                grounds.RemoveAt(i);
+                i--;
+                break;
+            }
+
+            grounds[i].transform.position = position;
         }
     }
 
@@ -104,8 +92,24 @@ public class GameControl : MonoBehaviour
         grounds.Add(newGround);
     }
 
-    public void GameOver()
+    public virtual void GameOver()
     {
         startText.SetActive(true);
+    }
+
+    public virtual void ResetGame()
+    {
+        startText.SetActive(false);
+        birdContoller.enabled = true;
+        score = 0;
+        scoreText.text = "0";
+
+        while (grounds.Count > 0)
+        {
+            Destroy(grounds[0]);
+            grounds.RemoveAt(0);
+        }
+
+        SpawnGround();
     }
 }
