@@ -17,26 +17,29 @@ public class GameControl : MonoBehaviour
     private float distroyX;
 
     [SerializeField]
-    private float scoreX;
+    protected float scoreX;
 
     [SerializeField]
     private float moveSpeed;
 
     [SerializeField]
     private float spawnGap;
-    private float spawnGapProgess;
+    private float spawnTimer;
+
+    [SerializeField]
+    private float spawnMinY, spawnMaxY;
 
     [SerializeField]
     private BirdContoller birdContoller;
 
     [SerializeField]
-    private GameObject startText;
+    protected GameObject startText;
 
     [SerializeField]
-    private TextMeshProUGUI scoreText;
+    protected TextMeshProUGUI scoreText;
     private int score;
 
-    private List<GameObject> grounds = new List<GameObject>();
+    protected List<GameObject> grounds = new List<GameObject>();
 
     protected virtual void Awake() {
         ins = this;
@@ -54,8 +57,8 @@ public class GameControl : MonoBehaviour
 
     protected void UpdateGround()
     {
-        spawnGapProgess += Time.deltaTime;
-        if (spawnGapProgess >= spawnGap)
+        spawnTimer += Time.deltaTime;
+        if (spawnTimer >= spawnGap)
             SpawnGround();
 
         for (int i = 0; i < grounds.Count; i++)
@@ -83,13 +86,16 @@ public class GameControl : MonoBehaviour
         }
     }
 
-    void SpawnGround()
+    protected void SpawnGround()
     {
-        spawnGapProgess = 0;
+        spawnTimer = 0;
 
         int index = Random.Range(0, groundSetPrefabs.Length);
         GameObject newGround = Instantiate(groundSetPrefabs[index]);
-        newGround.transform.position = spawnPosition;
+
+        Vector3 position = spawnPosition;
+        position.y = Random.Range(spawnMinY, spawnMaxY);
+        newGround.transform.position = position;
 
         grounds.Add(newGround);
     }
