@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using TMPro;
+using Nural;
 
 
 public class NuralGameControl : GameControl
@@ -29,6 +30,12 @@ public class NuralGameControl : GameControl
     private float m_gameStartTime, m_bestAliveTime;
     private int m_generationCount;
 
+    [SerializeField]
+    private string preloadNuralData;
+
+    [SerializeField]
+    private float evolveVariant;
+
     protected override void Awake() {
         ins = this;
     }
@@ -39,10 +46,7 @@ public class NuralGameControl : GameControl
 
         startText.gameObject.SetActive(false);
 
-        NuralControlBird bird = Instantiate<NuralControlBird>(birdPrefab);
-        bird.data = GetData("best-data.data");
-        // ResetGame();
-        SpawnGround();
+        ResetGame();
     }
 
     private void Update()
@@ -70,45 +74,71 @@ public class NuralGameControl : GameControl
 
     public void PrepareNewGeneration()
     {
-        if (m_birds != null)
-        {
-            NuralData bestData = m_birds[0].data;
-            float bestTime = 0;
-
-            for (var i = 0; i < birdCount; i++)
-            {
-                if (m_birdResults[i] > bestTime)
-                {
-                    bestData = m_birds[i].data;
-                    bestTime = m_birdResults[i];
-                }
-                Destroy(m_birds[i].gameObject);
-            }
-
-            SaveData(bestData, string.Format("generation-{0}.data", m_generationCount));
-
-            m_birds[0] = Instantiate<NuralControlBird>(birdPrefab);
-            m_birds[0].data = bestData;
-
-            for (var i = 1; i < birdCount; i++)
-            {
-                m_birds[i] = Instantiate<NuralControlBird>(birdPrefab);
-                m_birds[i].data = NuralData.Add(bestData, NuralData.Random(weightNum: 6, weightMin: -1f, weightMax: 1f, biasMin: -1f, biasMax: 1f));
-            }
-        }
+        if (m_birds != null) ImproveFromLastGeneration();
         else
         {
             m_birds = new NuralControlBird[birdCount];
 
-            for (var i = 0; i < birdCount; i++)
+            if (preloadNuralData != "")
             {
-                m_birds[i] = Instantiate<NuralControlBird>(birdPrefab);
-                m_birds[i].data = NuralData.Random(weightNum: 6);
+                NuralData preloadData = SavingSystem.GetData("best-data.data");
+
+                m_birds[0] = Instantiate<NuralControlBird>(birdPrefab);
+                m_birds[0].data = preloadData;
+
+                for (var i = 1; i < birdCount; i++)
+                {
+                    m_birds[i] = Instantiate<NuralControlBird>(birdPrefab);
+                    m_birds[i].data = EvolveFromBaseData(preloadData);
+                }
+            }
+            else
+            {
+                for (var i = 0; i < birdCount; i++)
+                {
+                    m_birds[i] = Instantiate<NuralControlBird>(birdPrefab);
+                    m_birds[i].data = NuralData.Random(weightNum: 6);
+                }
             }
         }
 
         m_generationCount += 1;
         generationCountText.text = m_generationCount.ToString();
+    }
+
+    private void ImproveFromLastGeneration()
+    {
+        NuralData bestData = m_birds[0].data;
+        float bestTime = 0;
+
+        for (var i = 0; i < birdCount; i++)
+        {
+            if (m_birdResults[i] > bestTime)
+            {
+                bestData = m_birds[i].data;
+                bestTime = m_birdResults[i];
+            }
+            Destroy(m_birds[i].gameObject);
+        }
+
+        SavingSystem.SaveData(bestData, string.Format("generation-{0}.data", m_generationCount));
+
+        m_birds[0] = Instantiate<NuralControlBird>(birdPrefab);
+        m_birds[0].data = bestData;
+
+        for (var i = 1; i < birdCount; i++)
+        {
+            m_birds[i] = Instantiate<NuralControlBird>(birdPrefab);
+            m_birds[i].data = EvolveFromBaseData(bestData);
+        }
+    }
+
+    private NuralData EvolveFromBaseData(NuralData data)
+    {
+        return NuralData.Add(data, NuralData.Random(
+            weightNum: 6,
+            weightMin: -evolveVariant, weightMax: evolveVariant,
+            biasMin: -evolveVariant, biasMax: evolveVariant));
     }
 
     public void BirdOver(NuralControlBird bird)
@@ -153,30 +183,10 @@ public class NuralGameControl : GameControl
         {
             if (m_birds[i].gameObject.activeSelf)
             {
-                SaveData(m_birds[i].data, "best-data.data");
+                SavingSystem.SaveData(m_birds[i].data, "best-data.data");
                 break;
             }
         }
-    }
-
-    public void SaveData(NuralData data, string fileName)
-    {
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
-
-        FileStream stream = new FileStream(Path.Combine(Application.persistentDataPath, fileName), FileMode.Create);
-        binaryFormatter.Serialize(stream, data);
-        stream.Close();
-    }
-
-    public NuralData GetData(string fileName)
-    {
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
-
-        FileStream stream = new FileStream(Path.Combine(Application.persistentDataPath, fileName), FileMode.Open);
-        NuralData data = (NuralData)binaryFormatter.Deserialize(stream);
-        stream.Close();
-
-        return data;
     }
 
 #if UNITY_EDITOR
