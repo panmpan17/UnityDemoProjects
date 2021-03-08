@@ -14,11 +14,19 @@ public class NuralControlBird : BirdContoller
         float[] inputs = new float[] {
             transform.position.x,
             transform.position.y,
+            rigidbody2D.velocity.y,
             upGround.position.x,
             upGround.position.y,
-            downGround.position.x,
             downGround.position.y,
         };
+
+        // float[] inputs = new float[] {
+        //     transform.position.y,
+        //     rigidbody2D.velocity.y,
+        //     upGround.position.x - transform.position.x,
+        //     downGround.position.y,
+        //     upGround.position.y - downGround.position.y,
+        // };
 
         float jump = NuralData.Proccess(data, inputs);
 

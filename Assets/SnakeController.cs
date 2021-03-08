@@ -88,7 +88,7 @@ public class SnakeController : MonoBehaviour
             List<Vector3> partPosition = new List<Vector3>();
             if (bodies.Count >= 1)
                 partPosition.Add(transform.position);
-            for (var i = 1; i < bodies.Count; i++)
+            for (int i = 1; i < bodies.Count; i++)
                 partPosition.Add(bodies[i - 1].position);
 
             if (waitSpawnBody > 0)
@@ -107,7 +107,7 @@ public class SnakeController : MonoBehaviour
             // transform.position = headPosition;
             rigidbody.position = headPosition;
             // rigidbody.
-            for (var i = 0; i < partPosition.Count; i++)
+            for (int i = 0; i < partPosition.Count; i++)
             {
                 bodies[i].position = partPosition[i];
             }
@@ -139,7 +139,7 @@ public class SnakeController : MonoBehaviour
     {
         if (position == transform.position)
             return false;
-        for (var i = 0; i < bodies.Count; i++)
+        for (int i = 0; i < bodies.Count; i++)
         {
             if (position == bodies[i].position)
                 return false;

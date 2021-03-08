@@ -11,7 +11,7 @@ public class BirdContoller : MonoBehaviour
     private bool upward;
     public float downwardAngularSpeed = -180;
 
-    private new Rigidbody2D rigidbody2D;
+    protected new Rigidbody2D rigidbody2D;
     private Vector3 initialPosition;
 
 

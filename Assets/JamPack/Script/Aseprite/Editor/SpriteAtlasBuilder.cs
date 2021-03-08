@@ -122,9 +122,9 @@ namespace AsepriteImporter
             var atlas = Texture2DUtil.CreateTransparentTexture(width, height);
             var index = 0;
 
-            for (var row = 0; row < rows; row++)
+            for (int row = 0; row < rows; row++)
             {
-                for (var col = 0; col < cols; col++)
+                for (int col = 0; col < cols; col++)
                 {
                     Rect spriteRect = new Rect(col * spriteSize.x, atlas.height - ((row + 1) * spriteSize.y),
                         spriteSize.x, spriteSize.y);
@@ -188,9 +188,9 @@ namespace AsepriteImporter
             var index = 0;
 
             // step through each pixel
-            for (var row = 0; row < rows; row++)
+            for (int row = 0; row < rows; row++)
             {
-                for (var col = 0; col < cols; col++)
+                for (int col = 0; col < cols; col++)
                 {
                     Rect spriteRect = new Rect(col * spriteSize.x, atlas.height - ((row + 1) * spriteSize.y),
                         spriteSize.x, spriteSize.y);

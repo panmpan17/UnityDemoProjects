@@ -35,7 +35,7 @@ public class NumberKeypadController : MonoBehaviour
             {
                 string s = m_number.ToString() + ".";
 
-                for (var i = 0; i < m_decimalZeroNumber; i++)
+                for (int i = 0; i < m_decimalZeroNumber; i++)
                     s += "0";
                 
                 if (m_decimalNumber > 0)

@@ -95,7 +95,7 @@ namespace MPack {
 
                 if (GUILayout.Button("Save")) {
                     string content = FileHead;
-                    for (var i = 0; i < types.Count; i++) {
+                    for (int i = 0; i < types.Count; i++) {
                         content += string.Format("\t\t{0} = {1},\n", types[i].Name, types[i].Value);
                     }
                     content += FileFoot;
